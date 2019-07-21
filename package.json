@@ -7,7 +7,7 @@
         "postinstall": "yarn --cwd client build"
     },
     "engines": {
-        "yarn": "1.23.0"
+        "yarn": "1.13.0"
       }
   }
   
