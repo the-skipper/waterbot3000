@@ -3,8 +3,8 @@
     "version": "0.1.0",
 
     "scripts": {
-        "start": "yarn --cwd server start ",
-        "postinstall": "yarn --cwd client build"
+        "start": "yarn --cwd server install && yarn --cwd server start ",
+        "postinstall": "yarn --cwd client install && yarn --cwd client build"
     },
     "engines": {
         "yarn": "1.13.0"
