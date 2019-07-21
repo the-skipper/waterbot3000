@@ -2,7 +2,8 @@
     "name": "waterbot3000",
     "version": "0.1.0",
     "scripts": {
-      "postinstall": "yarn install --cwd client && yarn build --cwd client "
+        "start": "yarn --cwd server start ",
+        "postinstall": "yarn --cwd client build"
     }
   }
   
