@@ -20,7 +20,7 @@ app.use(urlencoded({ extended: true }));
 
 app.use(json({ verify: verifyRequestSignature }));
 
-app.use(express.static(path.join(__dirname, "/../build")));
+app.use(express.static(path.join(__dirname, "/../client/build")));
 
 app.get("/webhook", (req, res) => {
   // Parse the query params
@@ -83,7 +83,7 @@ app.post("/webhook", (req, res) => {
 });
 // Handle all non API requests and delegate to React
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/../build/index.html"));
+  res.sendFile(path.join(__dirname, "/../client/build/index.html"));
 });
 
 function verifyRequestSignature(req, res, buf) {
