@@ -11,6 +11,8 @@
 const Response = require("./response"),
   GraphAPi = require("./graph-api");
 
+var myPayloads = ["REMIND_YES", "REMIND_NO", "EVERY_DAY_YES", "EVERY_DAY_NO"];
+
 module.exports = class Receive {
   constructor(user, webhookEvent) {
     this.user = user;
@@ -155,10 +157,7 @@ module.exports = class Receive {
     // Set the response based on the payload
     if (payload === "GET_STARTED_GREET") {
       response = Response.genStartMessage(this.user);
-    } else if (
-      payload.includes("REMIND_YES") ||
-      payload.includes("REMIND_NO")
-    ) {
+    } else if (payload.some(p => myPayloads.includes(p))) {
       switch (payload) {
         case "REMIND_YES":
           response = Response.genQuickReply(
@@ -176,13 +175,17 @@ module.exports = class Receive {
           );
           break;
         case "REMIND_NO":
-          response = Response.genQuickReply(
-            "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI",
-            []
+          response = Response.genText(
+            "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI"
           );
           break;
+        case "EVERY_DAY_YES":
+          // TODO SET REMINDERS
+          break;
+        case "EVERY_DAY_NO":
+          break;
       }
-      console.log(payload)
+      console.log(payload);
     } else {
       response = {
         text: `This is a default postback message for payload: ${payload}!`
