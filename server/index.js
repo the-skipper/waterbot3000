@@ -6,7 +6,8 @@ const express = require("express"),
   GraphAPi = require("./utils/graph-api"),
   User = require("./utils/user"),
   crypto = require("crypto"),
-  PayloadsHelper = require("./utils/payloads"),
+  // PayloadsHelper = require("./utils/payloads"),
+  Payloads = require("./models/payloads"),
   mongoose = require("mongoose"),
   app = express();
 
@@ -64,7 +65,8 @@ app.post("/webhook", (req, res) => {
           .then(userProfile => {
             user.setProfile(userProfile);
             user.syncProfile(userProfile);
-            PayloadsHelper.fetchAllPayloads()
+            Payloads.find({})
+              .exec()
               .then(ploads => {
                 payloads = [...ploads];
               })
@@ -87,7 +89,8 @@ app.post("/webhook", (req, res) => {
           });
       } else {
         // User already exists
-        PayloadsHelper.fetchAllPayloads()
+        Payloads.find({})
+          .exec()
           .then(ploads => {
             payloads = [...ploads];
           })
