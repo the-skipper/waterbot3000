@@ -191,6 +191,7 @@ module.exports = class Receive {
           };
       }
     } else {
+      console.log(this.mPayloads[0]);
       this.mPayloads.forEach(pl => {
         if (pl.payload === payload) {
           pl.text.replace(/\{firstName\}/g, this.user);
@@ -206,10 +207,11 @@ module.exports = class Receive {
       if (!response) {
         if (payload === "GET_STARTED_GREET") {
           response = Response.genStartMessage(this.user);
-        }else{ 
+        } else {
           response = {
-          text: `This is a default dynamic postback message for payload: ${payload}!`
-        };
+            text: `This is a default dynamic postback message for payload: ${payload}!`
+          };
+        }
       }
     }
 
