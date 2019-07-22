@@ -157,7 +157,7 @@ module.exports = class Receive {
     // Set the response based on the payload
     if (payload === "GET_STARTED_GREET") {
       response = Response.genStartMessage(this.user);
-    } else if (payload.in(myPayloads)) {
+    } else if (payload in myPayloads) {
       switch (payload) {
         case "REMIND_YES":
           response = Response.genQuickReply(
