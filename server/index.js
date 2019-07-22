@@ -118,6 +118,16 @@ app.get("/payloads", async (req, res) => {
   res.send(await Payloads.find({}).exec());
 });
 
+app.post("/payloads", async (req, res) => {
+  try {
+    let newPayload = await new Payloads(req.body).save();
+    res.status(201).send({ response: newPayload });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+  res.status(500).send("Error");
+});
+
 // Handle all non API requests and delegate to React Frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../client/build/index.html"));
