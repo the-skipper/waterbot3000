@@ -20,7 +20,6 @@ mongoose.connect(config.databaseUri);
 // populate available payloads
 
 app.use(urlencoded({ extended: true }));
-app.use(json);
 
 app.use(json({ verify: verifyRequestSignature }));
 
