@@ -113,6 +113,10 @@ app.post("/webhook", (req, res) => {
   }
 });
 
+app.get("/payloads", async (req, res) => {
+  res.send(await Payloads.find({}).exec());
+});
+
 // Handle all non API requests and delegate to React Frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../client/build/index.html"));
