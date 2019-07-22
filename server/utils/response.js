@@ -79,7 +79,7 @@ module.exports = class Response {
         payload: "REMIND_NO"
       }
     ];
-    let reminder = this.genQuickReply(welcome, quickReplies);
+    let reminder = this.genQuickReply("please choose", quickReplies);
 
     return [welcome, reminder];
   }

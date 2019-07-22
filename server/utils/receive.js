@@ -206,20 +206,6 @@ module.exports = class Receive {
       message: response
     };
 
-    // Check if there is persona id in the response
-    if ("persona_id" in response) {
-      let persona_id = response["persona_id"];
-      delete response["persona_id"];
-
-      requestBody = {
-        recipient: {
-          id: this.user.psid
-        },
-        message: response,
-        persona_id: persona_id
-      };
-    }
-
     setTimeout(() => GraphAPi.callSendAPI(requestBody), delay);
   }
 
