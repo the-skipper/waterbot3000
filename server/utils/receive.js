@@ -155,43 +155,41 @@ module.exports = class Receive {
     let response;
 
     // Set the response based on the payload
-    if (payload === "GET_STARTED_GREET") {
-      response = Response.genStartMessage(this.user);
-    } else if (payload in myPayloads) {
-      switch (payload) {
-        case "REMIND_YES":
-          response = Response.genQuickReply(
-            "Got it!, would you like to be reminded every day?",
-            [
-              {
-                title: "Sure!",
-                payload: "EVERY_DAY_YES"
-              },
-              {
-                title: "No, thanks",
-                payload: "EVERY_DAY_NO"
-              }
-            ]
-          );
-          break;
-        case "REMIND_NO":
-          response = Response.genText(
-            "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI"
-          );
-          break;
-        case "EVERY_DAY_YES":
-          // TODO SET REMINDERS
-          break;
-        case "EVERY_DAY_NO":
-          break;
-      }
-      console.log(payload);
-    } else {
-      response = {
-        text: `This is a default postback message for payload: ${payload}!`
-      };
+    switch (payload) {
+      case "GET_STARTED_GREET":
+          response = Response.genStartMessage(this.user);
+        break;
+      case "REMIND_YES":
+        response = Response.genQuickReply(
+          "Got it!, would you like to be reminded every day?",
+          [
+            {
+              title: "Sure!",
+              payload: "EVERY_DAY_YES"
+            },
+            {
+              title: "No, thanks",
+              payload: "EVERY_DAY_NO"
+            }
+          ]
+        );
+        break;
+      case "REMIND_NO":
+        response = Response.genText(
+          "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI"
+        );
+        break;
+      case "EVERY_DAY_YES":
+        // TODO SET REMINDERS
+        break;
+      case "EVERY_DAY_NO":
+        break;
+      default:
+        response = {
+          text: `This is a default postback message for payload: ${payload}!`
+        };
     }
-
+    console.log(payload);
     return response;
   }
 
