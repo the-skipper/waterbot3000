@@ -193,12 +193,9 @@ module.exports = class Receive {
     } else {
       this.mPayloads.forEach(pl => {
         if (pl.payload === payload) {
-          pl.text.replace(/\{firstName\}/g, this.user.firstName);
-          pl.text.replace(/\{lastName\}/g, this.user.lastName);
-          pl.text.replace(
-            /\{username\}/g,
-            this.user.firstName + " " + this.user.lastName
-          );
+          pl.text.replace(/\{firstName\}/g, this.user);
+          pl.text.replace(/\{lastName\}/g, this.user);
+          pl.text.replace(/\{username\}/g, this.user);
           if (pl.quick_replies.length > 0) {
             response = Response.genQuickReply(pl.text, pl.quick_replies);
           } else {
@@ -207,8 +204,11 @@ module.exports = class Receive {
         }
       });
       if (!response) {
-        response = {
-          text: `This is a default postback message for payload: ${payload}!`
+        if (payload === "GET_STARTED_GREET") {
+          response = Response.genStartMessage(this.user);
+        }else{ 
+          response = {
+          text: `This is a default dynamic postback message for payload: ${payload}!`
         };
       }
     }
