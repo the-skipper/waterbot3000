@@ -17,6 +17,9 @@ module.exports = {
 
   port: process.env.PORT || 3000,
 
+  // Mongo Database urI
+  databaseUri: process.env.MONGODB_URI,
+
   get webhookUrl() {
     return this.appUrl + "/webhook";
   },

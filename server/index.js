@@ -1,20 +1,19 @@
-/**
- *  Nikola Zdraveski - the-skipper
- *
- *
- *
- *
- *
- */
-
 const express = require("express"),
   { urlencoded, json } = require("body-parser"),
   path = require("path"),
   config = require("./utils/config"),
+  Receive = require("./utils/receive"),
+  GraphAPi = require("./utils/graph-api"),
+  User = require("./utils/user"),
   crypto = require("crypto"),
+  mongoose = require("mongoose"),
   app = express();
 
-var users = {};
+// connect to database
+mongoose.connect(config.databaseUri);
+
+// for fast check.
+var users = [];
 
 app.use(urlencoded({ extended: true }));
 
@@ -45,43 +44,46 @@ app.get("/webhook", (req, res) => {
 app.post("/webhook", (req, res) => {
   let body = req.body;
 
-  // Checks if this is an event from a page subscription
   if (body.object === "page") {
-    // Returns a '200 OK' response to all requests
+    // return 200 to fb so it stays calm
     res.status(200).send("EVENT_RECEIVED");
 
     // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function(entry) {
-      // Gets the body of the webhook event
+    body.entry.forEach(entry => {
+      // Gets the body of the webhook event, array but allways resolves to single event
       let webhookEvent = entry.messaging[0];
-      // console.log(webhookEvent);
-
-      // Discard uninteresting events
-      if ("read" in webhookEvent) {
-        // console.log("Got a read event");
-        return;
-      }
-
-      if ("delivery" in webhookEvent) {
-        // console.log("Got a delivery event");
-        return;
-      }
-
-      // Get the sender PSID
       let senderPsid = webhookEvent.sender.id;
 
       if (!(senderPsid in users)) {
-        // let user = new User(senderPsid);
+        let user = new User(senderPsid);
+
+        GraphAPi.getUserProfile(senderPsid)
+          .then(userProfile => {
+            user.setProfile(userProfile);
+            user.syncProfile(userProfile);
+          })
+          .catch(error => {
+            // The profile is unavailable
+            console.log("Profile is unavailable:", error);
+          })
+          .finally(() => {
+            users[senderPsid] = user;
+            let receiveMessage = new Receive(users[senderPsid], webhookEvent);
+            return receiveMessage.handleMessage();
+          });
       } else {
-        console.log("existing user");
+        // User already exists
+        let receiveMessage = new Receive(users[senderPsid], webhookEvent);
+        return receiveMessage.handleMessage();
       }
     });
   } else {
-    // Returns a '404 Not Found' if event is not from a page subscription
+    // Returns a '404 Not Found'
     res.sendStatus(404);
   }
 });
-// Handle all non API requests and delegate to React
+
+// Handle all non API requests and delegate to React Frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../client/build/index.html"));
 });
@@ -107,5 +109,3 @@ function verifyRequestSignature(req, res, buf) {
 var listener = app.listen(config.port, function() {
   console.log("Your app is listening on port " + listener.address().port);
 });
-
-// exports.waterbottrainer3000 = functions.https.onRequest(app)
