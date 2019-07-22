@@ -182,6 +182,7 @@ module.exports = class Receive {
           );
           break;
       }
+      console.log(payload)
     } else {
       response = {
         text: `This is a default postback message for payload: ${payload}!`
