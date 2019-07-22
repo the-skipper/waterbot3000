@@ -20,6 +20,7 @@ mongoose.connect(config.databaseUri);
 // populate available payloads
 
 app.use(urlencoded({ extended: true }));
+app.use(json);
 
 app.use(json({ verify: verifyRequestSignature }));
 
@@ -118,7 +119,7 @@ app.get("/payloads", async (req, res) => {
   res.send(await Payloads.find({}).exec());
 });
 
-app.post("/payloads", async (req, res) => {
+app.post("/payloads", (req, res) => {
   let payload = new Payloads(req.body);
   payload.save();
   res.status(201).send(payload);
