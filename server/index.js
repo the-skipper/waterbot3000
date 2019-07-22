@@ -6,14 +6,17 @@ const express = require("express"),
   GraphAPi = require("./utils/graph-api"),
   User = require("./utils/user"),
   crypto = require("crypto"),
+  PayloadsHelper = require("./utils/payloads"),
   mongoose = require("mongoose"),
   app = express();
 
+// for fast check.
+var users = [];
+var payloads = [];
 // connect to database
 mongoose.connect(config.databaseUri);
 
-// for fast check.
-var users = [];
+// populate available payloads
 
 app.use(urlencoded({ extended: true }));
 
@@ -61,6 +64,13 @@ app.post("/webhook", (req, res) => {
           .then(userProfile => {
             user.setProfile(userProfile);
             user.syncProfile(userProfile);
+            PayloadsHelper.fetchAllPayloads()
+              .then(ploads => {
+                payloads = [...ploads];
+              })
+              .catch(error => {
+                console.log(error);
+              });
           })
           .catch(error => {
             // The profile is unavailable
@@ -68,13 +78,30 @@ app.post("/webhook", (req, res) => {
           })
           .finally(() => {
             users[senderPsid] = user;
-            let receiveMessage = new Receive(users[senderPsid], webhookEvent);
+            let receiveMessage = new Receive(
+              users[senderPsid],
+              webhookEvent,
+              payloads
+            );
             return receiveMessage.handleMessage();
           });
       } else {
         // User already exists
-        let receiveMessage = new Receive(users[senderPsid], webhookEvent);
-        return receiveMessage.handleMessage();
+        PayloadsHelper.fetchAllPayloads()
+          .then(ploads => {
+            payloads = [...ploads];
+          })
+          .catch(error => {
+            console.log(error);
+          })
+          .finally(() => {
+            let receiveMessage = new Receive(
+              users[senderPsid],
+              webhookEvent,
+              payloads
+            );
+            return receiveMessage.handleMessage();
+          });
       }
     });
   } else {

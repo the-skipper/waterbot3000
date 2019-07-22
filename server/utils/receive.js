@@ -11,12 +11,13 @@
 const Response = require("./response"),
   GraphAPi = require("./graph-api");
 
-var myPayloads = ["REMIND_YES", "REMIND_NO", "EVERY_DAY_YES", "EVERY_DAY_NO"];
+var defaultPayloads = [];
 
 module.exports = class Receive {
-  constructor(user, webhookEvent) {
+  constructor(user, webhookEvent, availablePayloads) {
     this.user = user;
     this.webhookEvent = webhookEvent;
+    this.mPayloads = availablePayloads || defaultPayloads;
   }
 
   // Check if the event is a message or postback and
@@ -154,41 +155,64 @@ module.exports = class Receive {
 
     let response;
 
-    // Set the response based on the payload
-    switch (payload) {
-      case "GET_STARTED_GREET":
+    if (typeof this.mPayloads[0] === "string") {
+      switch (payload) {
+        case "GET_STARTED_GREET":
           response = Response.genStartMessage(this.user);
-        break;
-      case "REMIND_YES":
-        response = Response.genQuickReply(
-          "Got it!, would you like to be reminded every day?",
-          [
-            {
-              title: "Sure!",
-              payload: "EVERY_DAY_YES"
-            },
-            {
-              title: "No, thanks",
-              payload: "EVERY_DAY_NO"
-            }
-          ]
-        );
-        break;
-      case "REMIND_NO":
-        response = Response.genText(
-          "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI"
-        );
-        break;
-      case "EVERY_DAY_YES":
-        // TODO SET REMINDERS
-        break;
-      case "EVERY_DAY_NO":
-        break;
-      default:
+          break;
+        case "REMIND_YES":
+          response = Response.genQuickReply(
+            "Got it!, would you like to be reminded every day?",
+            [
+              {
+                title: "Sure!",
+                payload: "EVERY_DAY_YES"
+              },
+              {
+                title: "No, thanks",
+                payload: "EVERY_DAY_NO"
+              }
+            ]
+          );
+          break;
+        case "REMIND_NO":
+          response = Response.genText(
+            "Ok, but this happens if you don't drink enough, https://www.youtube.com/watch?v=8gqM4qtzEMI"
+          );
+          break;
+        case "EVERY_DAY_YES":
+          // TODO SET REMINDERS
+          break;
+        case "EVERY_DAY_NO":
+          break;
+        default:
+          response = {
+            text: `This is a default postback message for payload: ${payload}!`
+          };
+      }
+    } else {
+      this.mPayloads.forEach(pl => {
+        if (pl.payload === payload) {
+          pl.text.replace(/\{firstName\}/g, this.user.firstName);
+          pl.text.replace(/\{lastName\}/g, this.user.lastName);
+          pl.text.replace(
+            /\{username\}/g,
+            this.user.firstName + " " + this.user.lastName
+          );
+          if (pl.quick_replies.length > 0) {
+            response = Response.genQuickReply(pl.text, pl.quick_replies);
+          } else {
+            response = Response.genText(pl.text);
+          }
+        }
+      });
+      if (!response) {
         response = {
           text: `This is a default postback message for payload: ${payload}!`
         };
+      }
     }
+
     console.log(payload);
     return response;
   }

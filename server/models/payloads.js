@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 var PayloadSchema = new Schema({
-  reply_type: { type: String, unique: true },
+  payload: { type: String, unique: true },
   text: String,
   quick_replies: [
     {
