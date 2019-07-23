@@ -32,4 +32,12 @@ module.exports = class User {
       console.log("New User Database write failed");
     }
   }
+  static async findAll() {
+    try {
+      let users = ChatUsers.find({}).exec();
+      return users;
+    } catch (err) {
+      console.log("Couldnt find any");
+    }
+  }
 };

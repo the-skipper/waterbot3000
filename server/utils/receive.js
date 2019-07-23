@@ -194,6 +194,7 @@ module.exports = class Receive {
       console.log(this.mPayloads[0]);
       this.mPayloads.forEach(pl => {
         if (pl.payload === payload) {
+          // Add username to {fields} in the text
           pl.text.replace(/\{firstName\}/g, this.user);
           pl.text.replace(/\{lastName\}/g, this.user);
           pl.text.replace(/\{username\}/g, this.user);

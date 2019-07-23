@@ -17,6 +17,8 @@ module.exports = {
 
   port: process.env.PORT || 3000,
 
+  audience: process.env.AUDIENCE,
+  domain: process.env.AUTH0_DOMAIN,
   // Mongo Database urI
   databaseUri: process.env.MONGODB_URI,
 

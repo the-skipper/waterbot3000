@@ -1,15 +1,18 @@
 const express = require("express"),
   { urlencoded, json } = require("body-parser"),
   path = require("path"),
-  config = require("./utils/config"),
+  crypto = require("crypto"),
+  mongoose = require("mongoose"),
+  jwt = require("express-jwt"),
+  jwks = require("jwks-rsa"),
+  app = express();
+
+const config = require("./utils/config"),
   Receive = require("./utils/receive"),
   GraphAPi = require("./utils/graph-api"),
   User = require("./utils/user"),
-  crypto = require("crypto"),
-  // PayloadsHelper = require("./utils/payloads"),
   Payloads = require("./models/payloads"),
-  mongoose = require("mongoose"),
-  app = express();
+  DashboardApi = require("./utils/dashboard-api");
 
 // for fast check.
 var users = [];
@@ -17,7 +20,20 @@ var payloads = [];
 // connect to database
 mongoose.connect(config.databaseUri);
 
-// populate available payloads
+// add token validating middleware DashboardApi.messageAllUsers(req.body.message)
+var jwtCheck = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${config.domain}/.well-known/jwks.json`
+  }),
+  audience: config.audience,
+  issuer: `https://${config.domain}/`,
+  algorithms: ["RS256"]
+});
+
+// app.use(jwtCheck);
 
 app.use(urlencoded({ extended: true }));
 
@@ -114,14 +130,41 @@ app.post("/webhook", (req, res) => {
 });
 
 //
-app.get("/payloads", async (req, res) => {
-  res.send(await Payloads.find({}).exec());
+app.get("/api/payloads", jwtCheck, async (req, res) => {
+  try {
+    let payloads = await Payloads.find({}).exec();
+    res.json(payloads);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+  res.status(500).send("Error");
 });
 
-app.post("/payloads", async (req, res) => {
+app.post("/api/payloads", jwtCheck, async (req, res) => {
   try {
     let newPayload = await new Payloads(req.body).save();
     res.status(201).send({ response: newPayload });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+  res.status(500).send("Error");
+});
+
+app.post("/api/message", jwtCheck, async (req, res) => {
+  try {
+    // Validation..
+    DashboardApi.messageAllUsers(req.body.message);
+    res.json({ status: "success" });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+  res.status(500).send("Error");
+});
+
+app.get("/api/chatusers", jwtCheck, async (req, res) => {
+  try {
+    let users = await User.findAll();
+    res.json(users);
   } catch (err) {
     res.status(500).send(err);
   }
