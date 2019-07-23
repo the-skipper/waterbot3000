@@ -4,6 +4,7 @@ const DashBoard = () => {
   const { loading, user } = useAuth0();
   const [chatUsers, setChatUsers] = useState([]);
   const [payloads, setPayloads] = useState([]);
+  const [pltext, setText] = useState([]);
 
   const { getTokenSilently } = useAuth0();
 
@@ -51,6 +52,28 @@ const DashBoard = () => {
     return "Loading...";
   }
 
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const v = new FormData(e.target).entries();
+
+    try {
+      const token = await getTokenSilently();
+
+      const params = new URLSearchParams([...v]);
+      const response = await fetch("/api/payloads", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: params
+      });
+      const responseData = await response.json();
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <div id="accordion">
@@ -75,17 +98,17 @@ const DashBoard = () => {
             data-parent="#accordion"
           >
             <div className="card-body">
-              {chatUsers.length && 
-              <ul className="list-group">
-                {chatUsers.map((value, index) => {
-                  return (
-                    <li className="list-group-item" key={index}>{`${
-                      value.firstName
-                    } ${value.lastName}`}</li>
-                  );
-                })}
-              </ul>
-              }
+              {chatUsers.length && (
+                <ul className="list-group">
+                  {chatUsers.map((value, index) => {
+                    return (
+                      <li className="list-group-item" key={index}>{`${
+                        value.firstName
+                      } ${value.lastName}`}</li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -110,17 +133,31 @@ const DashBoard = () => {
             data-parent="#accordion"
           >
             <div className="card-body">
-              {payloads.length && 
-              <ul className="list-group">
-                {payloads.map((value, index) => {
-                  return (
-                    <li className="list-group-item" key={index}>{`${
-                      value.payload
-                    }`}</li>
-                  );
-                })}
-              </ul>
-              }
+              {payloads.length && (
+                <ul className="list-group">
+                  {payloads.map((value, index) => {
+                    return (
+                      <li className="list-group-item" key={index}>
+                        <label>{value.payload}</label>
+                        <form onSubmit={handleSubmit}>
+                          <label>
+                            {(pltext.length && pltext) || value.text} <br />
+                            <input
+                              name="text"
+                              type="text"
+                              value={pltext}
+                              onChange={e => {
+                                setText(e.target.value);
+                              }}
+                            />
+                          </label>
+                          <input type="submit" value="Save" />
+                        </form>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           </div>
         </div>

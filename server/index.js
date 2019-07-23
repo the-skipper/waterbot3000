@@ -12,6 +12,7 @@ const config = require("./utils/config"),
   GraphAPi = require("./utils/graph-api"),
   User = require("./utils/user"),
   Payloads = require("./models/payloads"),
+  PayloadHelper = require("./utils/payloads");
   DashboardApi = require("./utils/dashboard-api");
 
 // for fast check.
@@ -142,7 +143,7 @@ app.get("/api/payloads", jwtCheck, async (req, res) => {
 
 app.post("/api/payloads", jwtCheck, async (req, res) => {
   try {
-    let newPayload = await new Payloads(req.body).save();
+    let newPayload = await PayloadHelper.createPayload(req.body)
     res.status(201).send({ response: newPayload });
   } catch (err) {
     res.status(500).send(err);
