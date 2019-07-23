@@ -10,11 +10,10 @@ const DashBoard = () => {
   useEffect(() => {
     getUsers().then(users => {
       if (!chatUsers) setChatUsers(chatUsers);
-      
     });
-    getPayloads().then(p=>{
-      if (!payloads) setPayloads(p);
-    })
+    getPayloads().then(p => {
+      if (!payloads) setPayloads(payloads);
+    });
   }, []);
   const getUsers = async () => {
     try {
@@ -42,7 +41,7 @@ const DashBoard = () => {
         }
       });
       const responseData = await response.json();
-      setChatUsers(responseData);
+      setPayloads(responseData);
     } catch (error) {
       console.error(error);
     }
@@ -76,6 +75,7 @@ const DashBoard = () => {
             data-parent="#accordion"
           >
             <div className="card-body">
+              {chatUsers.length && 
               <ul className="list-group">
                 {chatUsers.map((value, index) => {
                   return (
@@ -85,6 +85,7 @@ const DashBoard = () => {
                   );
                 })}
               </ul>
+              }
             </div>
           </div>
         </div>
@@ -98,7 +99,7 @@ const DashBoard = () => {
                 aria-expanded="true"
                 aria-controls="collapseOne"
               >
-                Chatbot Users
+                Chatbot Payloads
               </button>
             </h5>
           </div>
@@ -109,6 +110,7 @@ const DashBoard = () => {
             data-parent="#accordion"
           >
             <div className="card-body">
+              {payloads.length && 
               <ul className="list-group">
                 {payloads.map((value, index) => {
                   return (
@@ -118,6 +120,7 @@ const DashBoard = () => {
                   );
                 })}
               </ul>
+              }
             </div>
           </div>
         </div>
