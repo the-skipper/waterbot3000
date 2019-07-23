@@ -171,10 +171,6 @@ app.get("/api/chatusers", jwtCheck, async (req, res) => {
   res.status(500).send("Error");
 });
 
-app.get('/authorized', jwtCheck , function (req, res) {
-  res.send('Secured Resource');
-});
-
 // Handle all non API requests and delegate to React Frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../client/build/index.html"));
