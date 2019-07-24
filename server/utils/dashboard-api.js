@@ -1,6 +1,7 @@
 request = require("request"),
 config = require("./config");
 const GraphAPi = require("./graph-api");
+const Response = require("./response");
 const User = require("./user");
 
 
@@ -9,12 +10,13 @@ module.exports = class DashboardApi {
   static async messageAllUsers(message) {
     let users = await User.findAll();
     console.log(users);
+    response = Response.genText(message);
     users.forEach(async user => {
       let requestBody = {
         recipient: {
           id: user.psid
         },
-        message: message
+        message: response
       };
       console.log(requestBody);
       // Send the HTTP request to the Messenger Platform
