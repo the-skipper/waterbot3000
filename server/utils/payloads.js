@@ -13,13 +13,19 @@ module.exports = class PayloadsHelper {
 
   static async createPayload(data) {
     try {
+      let payloaddata = data.quick_response
+        ? {
+            payload: data.payload,
+            text: data.text,
+            quick_response: data.quick_response
+          }
+        : {
+            payload: data.payload,
+            text: data.text
+          };
       let payload = await Payloads.findOneAndUpdate(
         { payload: data.payload },
-        {
-          payload: data.payload,
-          text: data.text,
-          quick_replies: data.quick_replies
-        },
+        payloaddata,
         { upsert: true }
       ).exec();
       return payload;
