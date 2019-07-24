@@ -16,7 +16,7 @@ module.exports = class DashboardApi {
       console.log(requestBody)
       try {
         let p = new Promise(resolve=>{GraphAPi.callSendAPI(requestBody); resolve();});
-        await p
+        return p
       } catch (e) {
         console.log(e);
       }
