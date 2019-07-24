@@ -154,8 +154,8 @@ app.post("/api/payloads", jwtCheck, async (req, res) => {
 app.post("/api/message", jwtCheck, async (req, res) => {
   try {
     // Validation..
-    await DashboardApi.messageAllUsers(req.body.message);
-    res.json({ status: "success" });
+    var m = await DashboardApi.messageAllUsers(req.body.message);
+    res.json({ m });
   } catch (err) {
     res.status(500).send(err);
   }

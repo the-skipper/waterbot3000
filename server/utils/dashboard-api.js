@@ -13,6 +13,7 @@ module.exports = class DashboardApi {
         },
         message: message
       };
+      console.log(requestBody)
       try {
         GraphAPi.callSendAPI(requestBody);
       } catch (e) {
