@@ -11,8 +11,10 @@ const Payload = (props) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const v = new FormData(e.target).entries();
-
+    const fd = new FormData(e.target);
+    fd.append("payload", props.payload.payload);
+    const v =fd.entries();
+    
     try {
       const token = await getTokenSilently();
 
