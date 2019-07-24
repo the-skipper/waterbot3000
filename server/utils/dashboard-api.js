@@ -1,5 +1,8 @@
+request = require("request"),
+config = require("./config");
 const GraphAPi = require("./graph-api");
 const User = require("./user");
+
 
 module.exports = class DashboardApi {
   //Message all users from database
@@ -13,13 +16,23 @@ module.exports = class DashboardApi {
         },
         message: message
       };
-      console.log(requestBody)
-      try {
-        let p = new Promise(resolve=>{GraphAPi.callSendAPI(requestBody); resolve();});
-        return p
-      } catch (e) {
-        console.log(e);
-      }
+      console.log(requestBody);
+      // Send the HTTP request to the Messenger Platform
+     return request(
+        {
+          uri: `${config.graphApiURL}/me/messages`,
+          qs: {
+            access_token: config.pageAccesToken
+          },
+          method: "POST",
+          json: requestBody
+        },
+        error => {
+          if (error) {
+            console.error("Unable to send message:", error);
+          }
+        }
+      );
     });
   }
 };
