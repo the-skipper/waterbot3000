@@ -10,7 +10,9 @@ module.exports = class DashboardApi {
   static async messageAllUsers(message) {
     let users = await User.findAll();
     console.log(users);
-    response = Response.genText(message)
+    console.log(message)
+    var response = Response.genText(message)
+    console.log(response)
     users.forEach(async user => {
       let requestBody = {
         recipient: {
@@ -19,7 +21,7 @@ module.exports = class DashboardApi {
         message: response
       };
       console.log(requestBody);
-      return new Promise(resolve=>{GraphAPi.callSendAPI(requestBody); resolve()});
+      GraphAPi.callSendAPI(requestBody);
     });
   }
 
