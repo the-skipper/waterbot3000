@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Payload from "../Payloads/Payloads";
 import { useAuth0 } from "../../react-auth0-wrapper";
 const DashBoard = () => {
   const { loading, user } = useAuth0();
   const [chatUsers, setChatUsers] = useState([]);
   const [payloads, setPayloads] = useState([]);
-  const [pltext, setText] = useState([]);
+  const [mtext, setMText] = useState([]);
+
 
   const { getTokenSilently } = useAuth0();
 
@@ -16,6 +18,30 @@ const DashBoard = () => {
       if (!payloads) setPayloads(payloads);
     });
   }, []);
+
+  const handleMessageSubmit = async e => {
+    e.preventDefault();
+    const v = new FormData(e.target).entries();
+
+    try {
+      const token = await getTokenSilently();
+
+      const params = new URLSearchParams([...v]);
+      const response = await fetch("/api/message", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: params
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
   const getUsers = async () => {
     try {
       const token = await getTokenSilently();
@@ -51,28 +77,6 @@ const DashBoard = () => {
   if (loading || !user) {
     return "Loading...";
   }
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    const v = new FormData(e.target).entries();
-
-    try {
-      const token = await getTokenSilently();
-
-      const params = new URLSearchParams([...v]);
-      const response = await fetch("/api/payloads", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: params
-      });
-      const responseData = await response.json();
-      console.log(response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <>
@@ -127,7 +131,6 @@ const DashBoard = () => {
             </h5>
           </div>
           <div
-            id="collapseOne"
             className="collapse show"
             aria-labelledby="headingOne"
             data-parent="#accordion"
@@ -136,28 +139,54 @@ const DashBoard = () => {
               {payloads.length && (
                 <ul className="list-group">
                   {payloads.map((value, index) => {
-                    return (
-                      <li className="list-group-item" key={index}>
-                        <label>{value.payload}</label>
-                        <form onSubmit={handleSubmit}>
-                          <label>
-                            {(pltext.length && pltext) || value.text} <br />
-                            <input
-                              name="text"
-                              type="text"
-                              value={pltext}
-                              onChange={e => {
-                                setText(e.target.value);
-                              }}
-                            />
-                          </label>
-                          <input type="submit" value="Save" />
-                        </form>
-                      </li>
-                    );
+                    return <Payload key={index} payload={value} />;
                   })}
                 </ul>
               )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="accordion">
+        <div className="card">
+          <div className="card-header" id="headingOne">
+            <h5 className="mb-0">
+              <button
+                className="btn btn-link"
+                data-toggle="collapse"
+                data-target="#collapseOne"
+                aria-expanded="true"
+                aria-controls="collapseOne"
+              >
+                Message users
+              </button>
+            </h5>
+          </div>
+          <div
+            id="collapseOne"
+            className="collapse show"
+            aria-labelledby="headingOne"
+            data-parent="#accordion"
+          >
+            <div className="card-body">
+              <ul className="list-group">
+                <li className="list-group-item">
+                  <label>Send message to all users</label>
+                  <form onSubmit={handleMessageSubmit}>
+                    <label>
+                      <input
+                        name="message"
+                        type="text"
+                        value={mtext}
+                        onChange={e => {
+                          setMText(e.target.value);
+                        }}
+                      />
+                    </label>
+                    <input type="submit" value="Send" />
+                  </form>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
