@@ -10,7 +10,7 @@ module.exports = class DashboardApi {
   static async messageAllUsers(message) {
     let users = await User.findAll();
     console.log(users);
-    response = Response.genText(message);
+    response = Response.genText(message)
     users.forEach(async user => {
       let requestBody = {
         recipient: {
@@ -19,22 +19,9 @@ module.exports = class DashboardApi {
         message: response
       };
       console.log(requestBody);
-      // Send the HTTP request to the Messenger Platform
-     return request(
-        {
-          uri: `${config.graphApiURL}/me/messages`,
-          qs: {
-            access_token: config.pageAccesToken
-          },
-          method: "POST",
-          json: requestBody
-        },
-        error => {
-          if (error) {
-            console.error("Unable to send message:", error);
-          }
-        }
-      );
+      return new Promise(resolve=>{GraphAPi.callSendAPI(requestBody); resolve()});
     });
   }
+
+  
 };
